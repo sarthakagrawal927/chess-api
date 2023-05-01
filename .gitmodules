@@ -1,0 +1,3 @@
+[submodule "stockfishjs"]
+	path = stockfishjs
+	url = https://github.com/nmrugg/stockfish.js.git
