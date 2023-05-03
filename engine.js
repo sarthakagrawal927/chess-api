@@ -1,17 +1,40 @@
+const { setTimeout } = require("timers/promises");
 const loadEngine = require("./stockfishjs/example/load_engine.js");
 let engine = loadEngine(require("path").join(__dirname, "/stockfishjs/src/stockfish.js"));
-const mode = "EVAL2"
 
-function getResult(fen, response){
-  engine.send("ucinewgame");
-  engine.send("position fen " + fen);
-  engine.send(mode === "EVAL" ? "eval" : "go depth 18", function onDone(result){
-    console.log({result})
-    return response.json({result})
-    // engine.quit();
-  }, function onStream(data){
-    console.log({data})
-  });
+const ENGINE_MODE = {
+  EVAL: 1,
+  BEST_MOVE: 2
 }
 
-module.exports = { getResult }
+const MODE_COMMAND = {
+  [ENGINE_MODE.EVAL]: "eval",
+  [ENGINE_MODE.BEST_MOVE]: "go depth 18"
+}
+
+async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE){
+  engine.send("ucinewgame");
+  engine.send("position fen " + fen);
+  return new Promise((resolve, _reject) => {
+    engine.send(MODE_COMMAND[mode], function onDone(result){
+      resolve(result)
+    }, function onStream(data){
+      if(data.startsWith("Final evaluation") && mode === ENGINE_MODE.EVAL){
+        resolve(data)
+      }
+    });
+    setTimeout(5000).then(()=>{
+      resolve("Stock-fish Timed out")
+    })
+  })
+}
+
+async function getResults(fen){
+  const [bestMove, winProbability] = await Promise.all([
+    getResult(fen, ENGINE_MODE.BEST_MOVE),
+    getResult(fen, ENGINE_MODE.EVAL),
+  ])
+  return {bestMove, winProbability}
+}
+
+module.exports = { getResults }

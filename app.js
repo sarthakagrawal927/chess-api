@@ -1,24 +1,27 @@
 const express = require('express')
-const app = express()
+const morgan = require('morgan')
 const http = require('http');
+const { Server } = require("socket.io");
+
+const { getResults } = require("./engine.js")
+
+const app = express()
 const server = http.createServer(app);
 const port = 8080
-const { Server } = require("socket.io");
 const io = new Server(server);
-const { getResult } = require("./engine.js")
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(morgan(':method :url :response-time ms'))
 
-app.post('/', (request, response) => {
-  return getResult(request.body.fen, response)
+app.post('/', async(request, response) => {
+  return response.json(await getResults(request.body.fen))
 });
 
 const leaveAllRooms = (socket, current) => {
   const rooms = socket.rooms.values()
 
   for (let val = rooms.next().value; val; val = rooms.next().value) {
-    console.log({val})
     if (val !== current) {
       socket.leave(val)
     }
@@ -26,7 +29,7 @@ const leaveAllRooms = (socket, current) => {
 }
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  // console.log('a user connected');
 
   socket.on("switch", (args) => {
     socket.join(args)
