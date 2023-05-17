@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const http = require('http');
 const { Server } = require("socket.io");
+const { Chess } = require('chess.js')
 
 const { getResults } = require("./engine.js");
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');
@@ -20,11 +21,22 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(morgan(':method :url :response-time ms'))
 
+const chess = new Chess();
+
 app.post('/', async(request, response) => {
-  if(!request.body.pgnFile) return response.json({error: "No pgn provided"})
-  // getMoves(request.body.pgnFile)
-  // const fen = printFEN()
-  return response.json(await getResults(fenStrings[0]))
+  if(!request.body.pgnFile && !request.body.fen) return response.json({error: "No pgn provided"})
+  try {
+    let fen = request.body.fen;
+    if(!fen) {
+      chess.loadPgn(request.body.pgnFile)
+      fen = chess.fen()
+      chess.reset()
+    }
+    response.status(200).json(await getResults(fen))
+  } catch(e) {
+    console.log({e})
+    return response.json({error: "Invalid pgn"})
+  }
 });
 
 let connectedUserCount = 0;
