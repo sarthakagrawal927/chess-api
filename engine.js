@@ -16,6 +16,7 @@ const loadEnginePro = () => {
 }
 
 async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
+  console.log({fen, mode})
   engine.send("ucinewgame");
   engine.send("position fen " + fen);
 
@@ -45,6 +46,7 @@ async function getResults(fen) {
     getResult(fen, ENGINE_MODE.BEST_MOVE),
     getResult(fen, ENGINE_MODE.EVAL)
   ]);
+  console.log({bestMove, winProbability})
 
   return { bestMove, winProbability };
 }

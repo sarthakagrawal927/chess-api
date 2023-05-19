@@ -32,6 +32,7 @@ app.post('/', async(request, response) => {
       fen = chess.fen()
       chess.reset()
     }
+    console.log({fen})
     response.status(200).json(await getResults(fen))
   } catch(e) {
     console.log({e})
@@ -95,13 +96,18 @@ server.listen(port, async (err) => {
 (async function simulateChess(){
   for (;;) {
     console.log({connectedUserCount})
-    if(connectedUserCount > 0) {
-      const fen = fenStrings[Math.floor(Math.random() * fenStrings.length)]
-      const results = await getResults(fen)
-      console.log({results})
-      io.local.emit('newMove', {...results, fen});
+    try {
+      if(connectedUserCount > 0) {
+        const fen = fenStrings[Math.floor(Math.random() * fenStrings.length)]
+        console.log({fen})
+        const results = await getResults(fen)
+        console.log({results})
+        io.local.emit('newMove', {...results, fen});
+      }
+      else await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch(err) {
+      console.log({err})
     }
-    else await new Promise(resolve => setTimeout(resolve, 1000));
     // const ltsRoom = Math.random() > 0.5 ? "room1" : "room2"
     // io.to(ltsRoom).emit('newMove', `result from ${ltsRoom}`);
   }
