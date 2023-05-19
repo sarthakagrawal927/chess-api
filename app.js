@@ -3,8 +3,8 @@ const morgan = require('morgan')
 const http = require('http');
 const { Server } = require("socket.io");
 const { Chess } = require('chess.js')
-
 const { getResults } = require("./engine.js");
+const logger = require('./logger.js');
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');
 
 const app = express()
@@ -21,6 +21,7 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(morgan(':method :url :response-time ms'))
 
+
 const chess = new Chess();
 
 app.post('/', async(request, response) => {
@@ -32,10 +33,10 @@ app.post('/', async(request, response) => {
       fen = chess.fen()
       chess.reset()
     }
-    console.log({fen})
+    logger.info({fen}, "New move in app.post")
     response.status(200).json(await getResults(fen))
   } catch(e) {
-    console.log({e})
+    logger.error({e}, "Error in app.post")
     return response.json({error: "Invalid pgn"})
   }
 });
@@ -68,7 +69,7 @@ const leaveAllRooms = (socket, current) => {
 
 io.on('connection', (socket) => {
   connectedUserCount += 1;
-  console.log('a user connected');
+  logger.info({connectedUserCount}, "New user connected")
 
   socket.on("joinRoom", (args) => {
     socket.join(args.roomId)
@@ -81,37 +82,39 @@ io.on('connection', (socket) => {
 
   socket.on("disconnect", () => {
     connectedUserCount -= 1;
-    console.log('a user disconnected');
+    logger.info({connectedUserCount}, "User disconnected")
   });
 });
 
 server.listen(port, async (err) => {
   if (err) {
-    return console.log('something bad happened', err)
+    return logger.error('something bad happened', err)
   }
-  console.log(`server is listening on ${port}`)
+  logger.info(`server is listening on ${port}`)
 });
 
 
 (async function simulateChess(){
   for (;;) {
-    console.log({connectedUserCount})
     try {
       if(connectedUserCount > 0) {
         const fen = fenStrings[Math.floor(Math.random() * fenStrings.length)]
-        console.log({fen})
+        logger.info({fen}, "New move in simulateChess")
+        await new Promise(resolve => setTimeout(resolve, 3000));
         const results = await getResults(fen)
-        console.log({results})
+        logger.info({results}, "Results from simulateChess")
         io.local.emit('newMove', {...results, fen});
       }
-      else await new Promise(resolve => setTimeout(resolve, 1000));
+      else await new Promise(resolve => setTimeout(resolve, 20000));
     } catch(err) {
       console.log({err})
+      logger.error({err}, "Error in simulateChess")
     }
     // const ltsRoom = Math.random() > 0.5 ? "room1" : "room2"
     // io.to(ltsRoom).emit('newMove', `result from ${ltsRoom}`);
   }
 })();
+
 
 // (function simulateVoting(){
 //   setInterval(()=>{
