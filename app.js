@@ -25,12 +25,13 @@ app.use(morgan(':method :url :response-time ms'))
 const chess = new Chess();
 
 app.post('/', async(request, response) => {
-  return response.json({res: "Received a file"})
+  // return response.json({res: "Received a file", body: request.body})
   if(!request.body.pgnFile && !request.body.fen) return response.json({error: "No pgn provided"})
   try {
     let fen = request.body.fen;
     if(!fen) {
       chess.loadPgn(request.body.pgnFile)
+      console.log(chess.header())
       fen = chess.fen()
       chess.reset()
     }
@@ -98,15 +99,16 @@ server.listen(port, async (err) => {
 (async function simulateChess(){
   for (;;) {
     try {
+      console.log({connectedUserCount})
       if(connectedUserCount > 0) {
         const fen = fenStrings[Math.floor(Math.random() * fenStrings.length)]
         logger.info({fen}, "New move in simulateChess")
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         const results = await getResults(fen)
         logger.info({results}, "Results from simulateChess")
         io.local.emit('newMove', {...results, fen});
       }
-      else await new Promise(resolve => setTimeout(resolve, 20000));
+      else await new Promise(resolve => setTimeout(resolve, 5000));
     } catch(err) {
       console.log({err})
       logger.error({err}, "Error in simulateChess")

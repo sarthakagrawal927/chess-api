@@ -26,7 +26,9 @@ async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
     };
 
     const onStream = (data) => {
+      console.log({data})
       if (data.startsWith("Final evaluation") && mode === ENGINE_MODE.EVAL) {
+        console.log("[RESOLVING]", {data})
         resolve(data);
       }
     };
