@@ -25,6 +25,7 @@ app.use(morgan(':method :url :response-time ms'))
 const chess = new Chess();
 
 app.post('/', async(request, response) => {
+  return response.json({res: "Received a file"})
   if(!request.body.pgnFile && !request.body.fen) return response.json({error: "No pgn provided"})
   try {
     let fen = request.body.fen;
