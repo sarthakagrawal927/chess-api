@@ -35,10 +35,10 @@ async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
       engine.send(MODE_COMMAND[mode], onDone, onStream);
     });
 
-    setTimeout(() => {
-      logger.error(`Timeout in getResult ${JSON.stringify({fen, mode, engine})}`);
-      resolve("timeout")
-    }, 10000);
+    // setTimeout(() => {
+    //   logger.error(`Timeout in getResult ${JSON.stringify({fen, mode, engine})}`);
+    //   resolve("timeout")
+    // }, 10000);
 
   }).catch((error) => {
     logger.error(`Error in getResult ${JSON.stringify({error, engine})}`);
