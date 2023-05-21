@@ -1,14 +1,13 @@
-const { createWyre } = require("@wyre-client/core");
-
-const UNIQUE_ID = "gcl:chess:live";
-/**
- *
- */
-export const wyreLoader = async (initialData = {}) => {
+async function wyreLoader() {
+  console.log("started.");
+  const { createWyre } = await import("@wyre-client/core");
   const sync = createWyre({
-    data: initialData,
-    onCreate: () => {},
+    data: {fen: []},
+    onChange: () => {},
   });
-  const data = await sync.init(UNIQUE_ID);
-  return data;
-};
+  const syncInstance = await sync.init("testing:dynamic:import5");
+  console.log("done.");
+  return syncInstance;
+}
+
+module.exports = { wyreLoader };

@@ -12,7 +12,6 @@ const app = express();
 const server = http.createServer(app);
 const port = 8080;
 const io = new Server(server);
-let wyreChess;
 
 const fenStrings = [
   "r4rk1/p2qn1pp/2pbbp2/3pp3/4P3/Q1Nn1N2/P1PBBPPP/R4RK1 w - - 0 14",
@@ -94,7 +93,8 @@ io.on("connection", (socket) => {
 });
 
 async function startServer() {
-  wyreChess = await wyreLoader({});
+  const wyreChess = await wyreLoader();
+  simulateChess(wyreChess);
 
   server.listen(port, async (err) => {
     if (err) {
@@ -102,30 +102,33 @@ async function startServer() {
     }
     logger.info(`server is listening on ${port}`);
   });
+
+  server.on("error", (err) => {
+    logger.error("server error", err);
+  });
 }
 
-(async function simulateChess() {
+async function simulateChess(wyreChess) {
   for (;;) {
     try {
-      console.log({ connectedUserCount });
-      if (connectedUserCount > 0) {
+      if (connectedUserCount) {
         let gameId = Math.floor(Math.random() * fenStrings.length);
         const fen = fenStrings[gameId];
         logger.info({ fen }, "New move in simulateChess");
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const results = await getResults(fen);
         logger.info({ results }, "Results from simulateChess");
-        wyreChess[1].push(fen);
+        if (wyreChess) {
+          logger.info("Pushing", { wyreChess }, "wyreChess");
+          wyreChess["fen"].push(fen);
+        }
         // io.local.emit("newMove", { ...results, fen });
       } else await new Promise((resolve) => setTimeout(resolve, 5000));
     } catch (err) {
-      console.log({ err });
       logger.error({ err }, "Error in simulateChess");
     }
-    // const ltsRoom = Math.random() > 0.5 ? "room1" : "room2"
-    // io.to(ltsRoom).emit('newMove', `result from ${ltsRoom}`);
   }
-})();
+}
 
 // (function simulateVoting(){
 //   setInterval(()=>{
