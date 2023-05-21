@@ -9,7 +9,7 @@ const ENGINE_MODE = {
 
 const MODE_COMMAND = {
   [ENGINE_MODE.EVAL]: "eval",
-  [ENGINE_MODE.BEST_MOVE]: "go depth 1"
+  [ENGINE_MODE.BEST_MOVE]: "go depth 10"
 }
 
 const loadEnginePro = () => {
@@ -17,7 +17,7 @@ const loadEnginePro = () => {
 }
 
 async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
-  console.log({fen, mode, engine})
+  logger.info({fen, mode, engine})
   engine.send("ucinewgame");
   engine.send("position fen " + fen);
 
@@ -27,9 +27,7 @@ async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
     };
 
     const onStream = (data) => {
-      console.log({data})
       if (data.startsWith("Final evaluation") && mode === ENGINE_MODE.EVAL) {
-        console.log("[RESOLVING]", {data})
         resolve(data);
       }
     };

@@ -11,6 +11,6 @@ curl \
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  -d "{\"pgnFile\": \"rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 0 14\"}" \
+  -d "{\"fen\": \"rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 0 14\"}" \
   "http://localhost:8080"
 ```

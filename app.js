@@ -21,11 +21,9 @@ app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(morgan(':method :url :response-time ms'))
 
-
 const chess = new Chess();
 
 app.post('/', async(request, response) => {
-  // return response.json({res: "Received a file", body: request.body})
   if(!request.body.pgnFile && !request.body.fen) return response.json({error: "No pgn provided"})
   try {
     let fen = request.body.fen;
@@ -61,7 +59,6 @@ let connectedUserCount = 0;
 
 const leaveAllRooms = (socket, current) => {
   const rooms = socket.rooms.values()
-
   for (let val = rooms.next().value; val; val = rooms.next().value) {
     if (val !== current) {
       socket.leave(val)
@@ -99,22 +96,18 @@ server.listen(port, async (err) => {
 (async function simulateChess(){
   for (;;) {
     try {
-      console.log({connectedUserCount})
       if(connectedUserCount > 0) {
         const fen = fenStrings[Math.floor(Math.random() * fenStrings.length)]
         logger.info({fen}, "New move in simulateChess")
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 200));
         const results = await getResults(fen)
         logger.info({results}, "Results from simulateChess")
         io.local.emit('newMove', {...results, fen});
       }
       else await new Promise(resolve => setTimeout(resolve, 5000));
     } catch(err) {
-      console.log({err})
       logger.error({err}, "Error in simulateChess")
     }
-    // const ltsRoom = Math.random() > 0.5 ? "room1" : "room2"
-    // io.to(ltsRoom).emit('newMove', `result from ${ltsRoom}`);
   }
 })();
 
