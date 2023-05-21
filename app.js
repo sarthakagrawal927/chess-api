@@ -109,12 +109,14 @@ async function startServer() {
     try {
       console.log({ connectedUserCount });
       if (connectedUserCount > 0) {
-        const fen = fenStrings[Math.floor(Math.random() * fenStrings.length)];
+        let gameId = Math.floor(Math.random() * fenStrings.length);
+        const fen = fenStrings[gameId];
         logger.info({ fen }, "New move in simulateChess");
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const results = await getResults(fen);
         logger.info({ results }, "Results from simulateChess");
-        io.local.emit("newMove", { ...results, fen });
+        wyreChess[1].push(fen);
+        // io.local.emit("newMove", { ...results, fen });
       } else await new Promise((resolve) => setTimeout(resolve, 5000));
     } catch (err) {
       console.log({ err });
