@@ -12,6 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const port = 8080;
 const io = new Server(server);
+let wyreChess;
 
 const fenStrings = [
   "r4rk1/p2qn1pp/2pbbp2/3pp3/4P3/Q1Nn1N2/P1PBBPPP/R4RK1 w - - 0 14",
@@ -34,6 +35,10 @@ app.post("/", async (request, response) => {
       chess.loadPgn(request.body.pgnFile);
       console.log(chess.header());
       fen = chess.fen();
+
+      // get id of the game
+      let gameId = "";
+      wyreChess[gameId].push(fen);
       chess.reset();
     }
     logger.info({ fen }, "New move in app.post");
@@ -89,7 +94,7 @@ io.on("connection", (socket) => {
 });
 
 async function startServer() {
-  await wyreLoader({});
+  wyreChess = await wyreLoader({});
 
   server.listen(port, async (err) => {
     if (err) {
