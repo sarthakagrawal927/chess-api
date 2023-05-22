@@ -10,11 +10,11 @@ const logger = createLogger({
   ],
 });
 
-if(process.env.APP_ENV !== 'dev') {
+// if(process.env.APP_ENV !== 'dev') {
   add(new transports.File({
     filename: '/combined.log',
     handleExceptions: true
   }));
-}
+// }
 
 module.exports = logger;

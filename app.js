@@ -1,17 +1,16 @@
 const express = require("express");
 const morgan = require("morgan");
 const http = require("http");
-const { Server } = require("socket.io");
 const { Chess } = require("chess.js");
 const { getResults } = require("./engine.js");
 const logger = require("./logger.js");
-const { wyreLoader } = require("./loader/wyre-loader.js");
+const { wyreLoader, ChessObjKey } = require("./loader/wyre-loader.js");
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');
 
 const app = express();
 const server = http.createServer(app);
 const port = 8080;
-const io = new Server(server);
+let wyreChess;
 
 const fenStrings = [
   "r4rk1/p2qn1pp/2pbbp2/3pp3/4P3/Q1Nn1N2/P1PBBPPP/R4RK1 w - - 0 14",
@@ -32,16 +31,15 @@ app.post("/", async (request, response) => {
     let fen = request.body.fen;
     if (!fen) {
       chess.loadPgn(request.body.pgnFile);
-      console.log(chess.header());
+      const chessHeader = chess.header();
+      const chessMoves = chess.moves();
       fen = chess.fen();
-
-      // get id of the game
-      let gameId = "";
-      wyreChess[gameId].push(fen);
+      const results = await getResults(fen);
+      const finishedChessResult = { fen, chessHeader, chessMoves, ...results };
+      wyreChess[ChessObjKey].push(finishedChessResult);
+      response.status(200).json(finishedChessResult);
       chess.reset();
     }
-    logger.info({ fen }, "New move in app.post");
-    response.status(200).json(await getResults(fen));
   } catch (e) {
     logger.error({ e }, "Error in app.post");
     return response.json({ error: "Invalid pgn" });
@@ -63,38 +61,10 @@ let connectedUserCount = 0;
 //   response.json(await getVoteResult(request.query.match_id))
 // })
 
-const leaveAllRooms = (socket, current) => {
-  const rooms = socket.rooms.values();
-
-  for (let val = rooms.next().value; val; val = rooms.next().value) {
-    if (val !== current) {
-      socket.leave(val);
-    }
-  }
-};
-
-io.on("connection", (socket) => {
-  connectedUserCount += 1;
-  logger.info({ connectedUserCount }, "New user connected");
-
-  socket.on("joinRoom", (args) => {
-    socket.join(args.roomId);
-    // leaveAllRooms(socket, args)
-  });
-
-  socket.on("leaveRoom", (args) => {
-    socket.leave(args.roomId);
-  });
-
-  socket.on("disconnect", () => {
-    connectedUserCount -= 1;
-    logger.info({ connectedUserCount }, "User disconnected");
-  });
-});
 
 async function startServer() {
-  const wyreChess = await wyreLoader();
-  simulateChess(wyreChess);
+  wyreChess = await wyreLoader();
+  simulateChess();
 
   server.listen(port, async (err) => {
     if (err) {
@@ -120,9 +90,8 @@ async function simulateChess(wyreChess) {
         logger.info({ results }, "Results from simulateChess");
         if (wyreChess) {
           logger.info("Pushing", { wyreChess }, "wyreChess");
-          wyreChess["fen"].push(fen);
+          wyreChess[ChessObjKey].push({fen, ...results});
         }
-        // io.local.emit("newMove", { ...results, fen });
       } else await new Promise((resolve) => setTimeout(resolve, 5000));
     } catch (err) {
       logger.error({ err }, "Error in simulateChess");

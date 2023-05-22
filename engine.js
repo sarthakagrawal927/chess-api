@@ -9,7 +9,7 @@ const ENGINE_MODE = {
 
 const MODE_COMMAND = {
   [ENGINE_MODE.EVAL]: "eval",
-  [ENGINE_MODE.BEST_MOVE]: "go depth 1"
+  [ENGINE_MODE.BEST_MOVE]: "go depth 18"
 }
 
 const loadEnginePro = () => {
@@ -51,7 +51,6 @@ async function getResults(fen) {
     getResult(fen, ENGINE_MODE.BEST_MOVE),
     getResult(fen, ENGINE_MODE.EVAL)
   ]);
-  logger.info({bestMove, winProbability}, "Results from getResults")
   return { bestMove, winProbability };
 }
 
