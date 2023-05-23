@@ -4,7 +4,7 @@ const http = require("http");
 const { Chess } = require("chess.js");
 const { getResults } = require("./engine.js");
 const logger = require("./logger.js");
-const { loadWyre, pushToWyre } = require("./wyre.js");
+const { pushToWyre } = require("./wyre.js");
 const votesRouter = require("./routes/votes.js");
 const { initializeSocket } = require("./socket.js");
 
@@ -56,7 +56,7 @@ app.post("/", async (request, response) => {
 async function startServer() {
   // await loadWyre();
   initializeSocket(server);
-  // simulateChess();
+  simulateChess();
 
   server.listen(port, async (err) => {
     if (err) {

@@ -1,4 +1,4 @@
-const { wyreLoader, ChessObjKey } = require("./loader/wyre-loader.js");
+const { ChessObjKey } = require("./loader/wyre-loader.js");
 const logger = require("./logger.js");
 const { sendToSocket } = require("./socket.js");
 
@@ -21,9 +21,9 @@ const pushToWyre = (data, retryCount = 2) => {
   }
 }
 
-const loadWyre = async () => {
-  wyreChess = await wyreLoader();
-  logger.info("[WYRE LOADED]");
-}
+// const loadWyre = async () => {
+//   wyreChess = await wyreLoader();
+//   logger.info("[WYRE LOADED]");
+// }
 
-module.exports = { pushToWyre, loadWyre }
+module.exports = { pushToWyre }
