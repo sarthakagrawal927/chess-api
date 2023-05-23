@@ -79,7 +79,6 @@ setInterval(async () => {
     let gameId = Math.floor(Math.random() * fenStrings.length);
     const fen = fenStrings[gameId];
     logger.info({ fen }, "New move in simulateChess");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     const results = await getResults(fen);
     logger.info({ results }, "Results from simulateChess");
     pushToWyre({ fen, ...results });
