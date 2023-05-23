@@ -6,6 +6,8 @@ const { getResults } = require("./engine.js");
 const logger = require("./logger.js");
 const { loadWyre, pushToWyre } = require("./wyre.js");
 const votesRouter = require("./routes/votes.js");
+const { initializeSocket } = require("./socket.js");
+
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');
 
 const app = express();
@@ -52,7 +54,8 @@ app.post("/", async (request, response) => {
 });
 
 async function startServer() {
-  await loadWyre();
+  // await loadWyre();
+  initializeSocket(server);
   // simulateChess();
 
   server.listen(port, async (err) => {
@@ -65,6 +68,11 @@ async function startServer() {
   server.on("error", (err) => {
     logger.error("server error", err);
   });
+
+  process.on("SIGINT", () => {
+    logger.info("SIGINT signal received.");
+    server.close();
+  })
 }
 
 async function simulateChess() {

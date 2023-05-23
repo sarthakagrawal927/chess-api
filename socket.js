@@ -1,6 +1,8 @@
 const { Server } = require("socket.io");
+const logger = require("./logger.js");
 
 let io;
+let connectedUserCount = 0;
 
 const leaveAllRooms = (socket, current) => {
   const rooms = socket.rooms.values();
@@ -12,25 +14,35 @@ const leaveAllRooms = (socket, current) => {
   }
 };
 
-io.on("connection", (socket) => {
-  connectedUserCount += 1;
-  logger.info({ connectedUserCount }, "New user connected");
+if(io){
+  io.on("connection", (socket) => {
+    connectedUserCount += 1;
+    logger.info({ connectedUserCount }, "New user connected");
 
-  socket.on("joinRoom", (args) => {
-    socket.join(args.roomId);
-    // leaveAllRooms(socket, args)
-  });
+    socket.on("joinRoom", (args) => {
+      socket.join(args.roomId);
+      // leaveAllRooms(socket, args)
+    });
 
-  socket.on("leaveRoom", (args) => {
-    socket.leave(args.roomId);
-  });
+    socket.on("leaveRoom", (args) => {
+      socket.leave(args.roomId);
+    });
 
-  socket.on("disconnect", () => {
-    connectedUserCount -= 1;
-    logger.info({ connectedUserCount }, "User disconnected");
+    socket.on("disconnect", () => {
+      connectedUserCount -= 1;
+      logger.info({ connectedUserCount }, "User disconnected");
+    });
   });
-});
+}
+
+
+const sendToSocket = (data) => {
+  io.local.emit("data", data);
+}
+
 
 function initializeSocket(server){
    io = new Server(server)
 }
+
+module.exports = {initializeSocket, sendToSocket};
