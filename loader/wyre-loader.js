@@ -7,7 +7,7 @@ async function wyreLoader() {
     data: {[ChessObjKey]: []},
     onChange: () => {},
   });
-  const syncInstance = await sync.init("testing:dynamic:import5");
+  const syncInstance = await sync.init("testing:dynamic:import6");
   console.log("done.");
   return syncInstance;
 }

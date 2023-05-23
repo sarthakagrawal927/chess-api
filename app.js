@@ -52,8 +52,8 @@ app.post("/", async (request, response) => {
 });
 
 async function startServer() {
-  await loadRWyre();
-  simulateChess();
+  await loadWyre();
+  // simulateChess();
 
   server.listen(port, async (err) => {
     if (err) {
