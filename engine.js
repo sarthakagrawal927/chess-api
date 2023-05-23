@@ -45,13 +45,21 @@ async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
   });
 }
 
+const numberRegex = /-?\d+\.?\d*/;
+
 async function getResults(fen) {
   loadEnginePro();
-  const [bestMove, winProbability] = await Promise.all([
-    getResult(fen, ENGINE_MODE.BEST_MOVE),
-    getResult(fen, ENGINE_MODE.EVAL)
-  ]);
-  return { bestMove, winProbability };
+  try {
+    let [bestMove, winProbability] = await Promise.all([
+      getResult(fen, ENGINE_MODE.BEST_MOVE),
+      getResult(fen, ENGINE_MODE.EVAL) // Final evaluation       -2.49 (white side)
+    ]);
+    winProbability = parseFloat(winProbability.match(numberRegex)[0]);
+    return { bestMove, winProbability };
+  } catch (err) {
+    logger.error({ err }, "Error in getResults");
+    throw err;
+  }
 }
 
 module.exports = { getResults }
