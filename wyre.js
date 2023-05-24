@@ -1,11 +1,11 @@
 const { ChessObjKey, wyreLoader } = require("./loader/wyre-loader.js");
 const logger = require("./logger.js");
-const { sendToSocket } = require("./socket.js");
+// const { sendToSocket } = require("./socket.js");
 
 let wyreChess;
 
 const pushToWyre = (data, retryCount = 2) => {
-  sendToSocket(data);
+  // sendToSocket(data);
   if (wyreChess) {
     wyreChess[ChessObjKey].push(data);
     logger.info("[PUSHING TO WYRE]", { data });
@@ -22,6 +22,7 @@ const pushToWyre = (data, retryCount = 2) => {
 
 const loadWyre = async () => {
   wyreChess = await wyreLoader();
+  console.log(wyreChess)
   logger.info("[WYRE LOADED]");
 }
 

@@ -5,8 +5,8 @@ const { Chess } = require("chess.js");
 const { getResults } = require("./engine.js");
 const logger = require("./logger.js");
 const { pushToWyre, loadWyre } = require("./wyre.js");
-const votesRouter = require("./routes/votes.js");
-const { initializeSocket } = require("./socket.js");
+// const votesRouter = require("./routes/votes.js");
+// const { initializeSocket } = require("./socket.js");
 
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');
 
@@ -25,8 +25,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 app.use(morgan(":method :url :response-time ms"));
 
 // routes
-app.use(votesRouter)
-
+// app.use(votesRouter)
 
 const chess = new Chess();
 
@@ -55,7 +54,7 @@ app.post("/", async (request, response) => {
 
 async function startServer() {
   await loadWyre();
-  initializeSocket(server);
+  // initializeSocket(server);
 
   server.listen(port, async (err) => {
     if (err) {
