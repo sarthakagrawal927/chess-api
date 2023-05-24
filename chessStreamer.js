@@ -64,7 +64,7 @@ const movesData = [
 ];
 
 
-async function simulateChessGame (gameId) {
+async function simulateChessGame (gameId = 1) {
   console.log({gameId})
   const chess = new Chess();
   let currentPgn = pgnHeader;
