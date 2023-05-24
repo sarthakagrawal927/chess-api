@@ -5,6 +5,7 @@ const { Chess } = require("chess.js");
 const { getResults } = require("./engine.js");
 const logger = require("./logger.js");
 const { pushToWyre, loadWyre } = require("./wyre.js");
+const { simulateChessGame } = require("./chessStreamer.js");
 // const votesRouter = require("./routes/votes.js");
 // const { initializeSocket } = require("./socket.js");
 
@@ -54,6 +55,8 @@ app.post("/", async (request, response) => {
 
 async function startServer() {
   await loadWyre();
+  // for(let i=0;i<6;i++)
+    simulateChessGame(2);
   // initializeSocket(server);
 
   server.listen(port, async (err) => {
@@ -73,17 +76,17 @@ async function startServer() {
   })
 }
 
-setInterval(async () => {
-  try {
-    let gameId = Math.floor(Math.random() * fenStrings.length);
-    const fen = fenStrings[gameId];
-    logger.info({ fen }, "New move in simulateChess");
-    const results = await getResults(fen);
-    logger.info({ results }, "Results from simulateChess");
-    pushToWyre({ fen, ...results });
-  } catch (err) {
-    logger.error({ err }, "Error in simulateChess");
-  }
-}, 1000);
+// setInterval(async () => {
+//   try {
+//     let gameId = Math.floor(Math.random() * fenStrings.length);
+//     const fen = fenStrings[gameId];
+//     logger.info({ fen }, "New move in simulateChess");
+//     const results = await getResults(fen);
+//     logger.info({ results }, "Results from simulateChess");
+//     pushToWyre({ fen, ...results });
+//   } catch (err) {
+//     logger.error({ err }, "Error in simulateChess");
+//   }
+// }, 1000);
 
 startServer();

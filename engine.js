@@ -51,13 +51,14 @@ async function getResults(fen) {
   loadEnginePro();
   try {
     let [bestMove, winProbability] = await Promise.all([
-      getResult(fen, ENGINE_MODE.BEST_MOVE),
+      null, // getResult(fen, ENGINE_MODE.BEST_MOVE),
       getResult(fen, ENGINE_MODE.EVAL) // Final evaluation       -2.49 (white side)
     ]);
-    winProbability = parseFloat(winProbability.match(numberRegex)[0]);
+    const numberPresent = winProbability.match(numberRegex);
+    winProbability = (numberPresent && numberPresent.length > 0) ? parseFloat(winProbability.match(numberRegex)[0]) : null;
     return { bestMove, winProbability };
   } catch (err) {
-    logger.error({ err }, "Error in getResults");
+    logger.error(`Error in getResults: ${err.message}, fen: ${fen}`);
     throw err;
   }
 }
