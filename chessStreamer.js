@@ -1,6 +1,7 @@
 const { Chess } = require("chess.js");
 const { getResults } = require("./engine");
 const { pushToWyre } = require("./wyre");
+const { printMemoryUsage } = require("./memoryUsage");
 // const { printMemoryUsage } = require("./memoryUsage");
 
 const pgnHeader = `[Event "FIDE World Championship Match 2023 Rapid Tie-break"]
@@ -67,13 +68,18 @@ async function simulateChessGame (gameId) {
   console.log({gameId})
   const chess = new Chess();
   let currentPgn = pgnHeader;
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   let startTime = Date.now();
-  for (let i = 0; i < movesData.length; i++) {
+  for (let i = 0; i < 10; i++) {
     currentPgn += ` ${movesData[i]}`;
     chess.loadPgn(currentPgn);
     const chessHeader = chess.header();
     const chessMoves = chess.moves();
     const fen = chess.fen();
+    if(!fen){
+      logger.error("Could not generate FEN",{currentPgn})
+      continue;
+    }
     const results = await getResults(fen);
     const finishedChessResult = { fen, chessHeader, chessMoves, ...results };
     if (i === movesData.length - 1) {
@@ -82,8 +88,8 @@ async function simulateChessGame (gameId) {
     }
     const endTime = Date.now();
     console.log(`GameID: ${gameId} Time taken for the move ${endTime - startTime}ms`);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // printMemoryUsage();
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    printMemoryUsage();
     startTime = Date.now();
     pushToWyre(finishedChessResult);
     chess.reset();

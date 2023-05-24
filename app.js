@@ -66,14 +66,18 @@ async function startServer() {
     logger.info(`server is listening on ${port}`);
   });
 
-  server.on("error", (err) => {
-    logger.error("server error", err);
+  // Gracefully handle server shutdown
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT signal. Shutting down gracefully...');
+    server.close((err) => {
+      if (err) {
+        console.error('Error closing the server:', err);
+        process.exit(1);
+      }
+      console.log('Server closed.');
+      process.exit(0);
+    });
   });
-
-  process.on("SIGINT", () => {
-    logger.info("SIGINT signal received.");
-    exit(0);
-  })
 }
 
 // setInterval(async () => {
