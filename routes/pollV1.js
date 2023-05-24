@@ -1,6 +1,8 @@
 const express = require('express')
 const catcher = require('../utils/functions')
 const { executeQuery } = require('../utils/db')
+const { pushToWyre } = require('../wyre')
+const { WYRE_MESSAGE_TYPE } = require('../utils/constants')
 const votesRouter = express.Router()
 
 /**
@@ -23,6 +25,7 @@ votesRouter.get('/', catcher(async(request, response) => {
   if(!request.query.match_id) {
     return response.status(400).json({status: "error", message: "match_id is required"})
   }
+  // TODO: send only if person has not reacted
   return await executeQuery('SELECT * FROM poll WHERE match_id = $1', [request.query.match_id], response)
 }))
 
@@ -37,7 +40,7 @@ votesRouter.post('/create', catcher(async(request, response) => {
   if(!request.body.matchId || !request.body.question || !request.body.options) {
     return response.status(400).json({status: "error", message: "matchId, question and options are required"})
   }
-  // send to WYRE
+  pushToWyre({...request.body}, WYRE_MESSAGE_TYPE.POLL)
   return await executeQuery('INSERT INTO poll (match_id, question, options) VALUES ($1, $2, $3)', [request.body.matchId, request.body.question, request.body.options], response)
 }))
 

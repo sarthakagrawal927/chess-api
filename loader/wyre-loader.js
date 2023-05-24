@@ -1,17 +1,17 @@
-const ChessObjKey = 'chessObj';
-
-async function wyreLoader() {
+const getWyreSyncInstance = async () => {
   console.log("started.");
   const { createWyre } = await import("@wyre-client/core");
   console.log("imported.");
-  const sync = createWyre({
-    data: {[ChessObjKey]: []},
+  return async (dataKey, instanceKey) => {
+    const sync = createWyre({
+    data: {[dataKey]: []},
     onChange: () => {},
-  });
-  console.log("created.");
-  const syncInstance = await sync.init("testing:dynamic:import18");
-  console.log("done.");
-  return syncInstance;
+    });
+    console.log(`${dataKey}: ${instanceKey}: created.`);
+    const syncInstance = await sync.init(instanceKey);
+    console.log(`${dataKey}: ${instanceKey}: done.`);
+    return syncInstance;
+  }
 }
 
-module.exports = { wyreLoader, ChessObjKey };
+module.exports = { getWyreSyncInstance };

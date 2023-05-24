@@ -20,7 +20,7 @@ pool.connect((err, client, release) => {
     if (err) {
       return console.error('Error executing query', err.stack)
     }
-    console.log(result.rows)
+    console.log("Database successfully connected", result.rows)
   })
 })
 

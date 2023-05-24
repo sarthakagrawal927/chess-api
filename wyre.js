@@ -1,14 +1,16 @@
-const { ChessObjKey, wyreLoader } = require("./loader/wyre-loader.js");
+const { getWyreSyncInstance } = require("./loader/wyre-loader.js");
 const logger = require("./logger.js");
+const { WYRE_DATA_OBJ_KEY, WYRE_MESSAGE_TYPE } = require("./utils/constants.js");
 // const { sendToSocket } = require("./socket.js");
 
-let wyreChess;
+let wyreMessageTypeToInstance;
 
-const pushToWyre = (data, retryCount = 2) => {
+const pushToWyre = (data, wyreMessageType = WYRE_MESSAGE_TYPE.CHESS_OBJ, retryCount = 2) => {
   // sendToSocket(data);
-  if (wyreChess) {
-    wyreChess[ChessObjKey].push(data);
-    logger.info("[PUSHING TO WYRE]", { data });
+  if (wyreMessageTypeToInstance[wyreMessageType]) {
+    const dataKey = WYRE_DATA_OBJ_KEY[wyreMessageType];
+    wyreMessageTypeToInstance[wyreMessageType][dataKey].push(data);
+    logger.info(`[PUSHING TO WYRE]: ${dataKey} ${JSON.stringify(data)}`);
   } else {
     logger.info("[WYRE NOT LOADED]");
     if (retryCount) {
@@ -21,9 +23,13 @@ const pushToWyre = (data, retryCount = 2) => {
 }
 
 const loadWyre = async () => {
-  wyreChess = await wyreLoader();
-  console.log(wyreChess)
-  logger.info("[WYRE LOADED]");
+  let wyreInstanceCreator = await getWyreSyncInstance();
+  wyreMessageTypeToInstance = {
+    [WYRE_MESSAGE_TYPE.CHESS_OBJ]: await wyreInstanceCreator(WYRE_DATA_OBJ_KEY.CHESS_OBJ, "testing:dynamic:import18"),
+    [WYRE_MESSAGE_TYPE.COMMENTARY]: await wyreInstanceCreator(WYRE_DATA_OBJ_KEY.COMMENTARY, "testing:dynamic:import19"),
+    [WYRE_MESSAGE_TYPE.POLL]: await wyreInstanceCreator(WYRE_DATA_OBJ_KEY.POLL, "testing:dynamic:import20"),
+  }
+  logger.info("[ALL WYRE INSTANCES LOADED]");
 }
 
-module.exports = { pushToWyre,loadWyre }
+module.exports = { pushToWyre, loadWyre }

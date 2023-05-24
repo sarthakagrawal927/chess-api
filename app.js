@@ -58,7 +58,7 @@ app.use((err, _req, res, _next) => {
 
 async function startServer() {
   await loadWyre();
-  simulateChessGame();
+  // simulateChessGame();
 
   server.listen(port, async (err) => {
     if (err) {

@@ -2,6 +2,8 @@ const express = require('express');
 const commentaryRouter = express.Router();
 const catcher = require('../utils/functions');
 const { executeQuery } = require('../utils/db');
+const { pushToWyre } = require('../wyre');
+const { WYRE_MESSAGE_TYPE } = require('../utils/constants');
 
 /**
  * CREATE TABLE commentary (
@@ -22,7 +24,7 @@ commentaryRouter.post('/add', catcher( async(request, response) => {
   if(!request.body.matchId || !request.body.text) {
     return response.status(400).json({status: "error", message: "matchId and text are required"})
   }
-  // send to WYRE
+  pushToWyre({...request.body}, WYRE_MESSAGE_TYPE.COMMENTARY)
   return await executeQuery('INSERT INTO commentary (match_id, text) VALUES ($1, $2)', [request.body.matchId, request.body.text], response)
 }))
 

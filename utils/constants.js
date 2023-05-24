@@ -3,6 +3,12 @@ const fenStrings = [
   "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b - - 0 14",
 ];
 
+const WYRE_MESSAGE_TYPE = {
+  CHESS_OBJ: "CHESS_OBJ",
+  POLL: "POLL",
+  COMMENTARY: "COMMENTARY",
+}
+
 const WYRE_DATA_OBJ_KEY = {
   CHESS_OBJ: "chessObj",
   POLL: "poll",
@@ -10,6 +16,7 @@ const WYRE_DATA_OBJ_KEY = {
 }
 
 module.exports = {
+  WYRE_MESSAGE_TYPE,
   fenStrings,
   WYRE_DATA_OBJ_KEY,
 }
