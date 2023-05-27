@@ -1,7 +1,7 @@
 const { Chess } = require("chess.js");
-const { getResults } = require("./engine");
 const { pushToWyre } = require("./wyre");
 const { printMemoryUsage } = require("./memoryUsage");
+const { getDataWithFen } = require("./utils/chessify");
 // const { printMemoryUsage } = require("./memoryUsage");
 
 const pgnHeader = `[Event "FIDE World Championship Match 2023 Rapid Tie-break"]
@@ -80,7 +80,7 @@ async function simulateChessGame (gameId) {
       logger.error("Could not generate FEN",{currentPgn})
       continue;
     }
-    const results = await getResults(fen);
+    const results = await getDataWithFen(fen);
     const finishedChessResult = { fen, chessHeader, chessMoves, ...results };
     if (i === movesData.length - 1) {
       i = -1;

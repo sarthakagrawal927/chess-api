@@ -2,12 +2,12 @@ const express = require("express");
 const morgan = require("morgan");
 const http = require("http");
 const { Chess } = require("chess.js");
-const { getResults } = require("./engine.js");
 const logger = require("./logger.js");
 const { pushToWyre, loadWyre } = require("./wyre.js");
 const { simulateChessGame } = require("./chessStreamer.js");
-// const votesRouter = require("./routes/votes.js");
-// const { initializeSocket } = require("./socket.js");
+const commentaryRouter = require("./routes/commentary.js");
+const votesRouter = require("./routes/pollV1.js");
+const { getDataWithFen } = require("./utils/chessify.js");
 
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');
 
@@ -41,7 +41,7 @@ app.post("/", async (request, response) => {
       const chessHeader = chess.header();
       const chessMoves = chess.moves();
       fen = chess.fen();
-      const results = await getResults(fen);
+      const results = await getDataWithFen(fen);
       const finishedChessResult = { fen, chessHeader, chessMoves, ...results };
       pushToWyre(finishedChessResult);
       response.status(200).json(finishedChessResult);
