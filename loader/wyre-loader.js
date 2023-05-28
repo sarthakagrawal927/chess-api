@@ -9,7 +9,7 @@ async function wyreLoader() {
     onChange: () => {},
   });
   console.log("created.");
-  const syncInstance = await sync.init("testing:dynamic:import18");
+  const syncInstance = await sync.init("testing:dynamic:import23");
   console.log("done.");
   return syncInstance;
 }

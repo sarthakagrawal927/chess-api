@@ -5,8 +5,6 @@ const { Chess } = require("chess.js");
 const logger = require("./logger.js");
 const { pushToWyre, loadWyre } = require("./wyre.js");
 const { simulateChessGame } = require("./chessStreamer.js");
-const commentaryRouter = require("./routes/commentary.js");
-const votesRouter = require("./routes/pollV1.js");
 const { getDataWithFen } = require("./utils/chessify.js");
 
 // const { addVoteToQueue, getProgressReport, getVoteResult } = require('./queue.js');

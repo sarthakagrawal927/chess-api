@@ -2,6 +2,7 @@ const { Chess } = require("chess.js");
 const { pushToWyre } = require("./wyre");
 const { printMemoryUsage } = require("./memoryUsage");
 const { getDataWithFen } = require("./utils/chessify");
+const logger = require("./logger");
 // const { printMemoryUsage } = require("./memoryUsage");
 
 const pgnHeader = `[Event "FIDE World Championship Match 2023 Rapid Tie-break"]
@@ -68,9 +69,10 @@ async function simulateChessGame (gameId) {
   console.log({gameId})
   const chess = new Chess();
   let currentPgn = pgnHeader;
+  let clearTheArray = false;
   await new Promise((resolve) => setTimeout(resolve, 5000));
   let startTime = Date.now();
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < movesData.length; i++) {
     currentPgn += ` ${movesData[i]}`;
     chess.loadPgn(currentPgn);
     const chessHeader = chess.header();
@@ -85,13 +87,15 @@ async function simulateChessGame (gameId) {
     if (i === movesData.length - 1) {
       i = -1;
       currentPgn = pgnHeader;
+      clearTheArray = true;
     }
     const endTime = Date.now();
     console.log(`GameID: ${gameId} Time taken for the move ${endTime - startTime}ms`);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     printMemoryUsage();
     startTime = Date.now();
-    pushToWyre(finishedChessResult);
+    pushToWyre(finishedChessResult, clearTheArray);
+    clearTheArray = false;
     chess.reset();
   }
 }
