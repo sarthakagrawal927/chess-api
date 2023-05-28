@@ -4,15 +4,15 @@ const logger = require("./logger.js");
 let io;
 let connectedUserCount = 0;
 
-const leaveAllRooms = (socket, current) => {
-  const rooms = socket.rooms.values();
+// const leaveAllRooms = (socket, current) => {
+//   const rooms = socket.rooms.values();
 
-  for (let val = rooms.next().value; val; val = rooms.next().value) {
-    if (val !== current) {
-      socket.leave(val);
-    }
-  }
-};
+//   for (let val = rooms.next().value; val; val = rooms.next().value) {
+//     if (val !== current) {
+//       socket.leave(val);
+//     }
+//   }
+// };
 
 if(io){
   io.on("connection", (socket) => {

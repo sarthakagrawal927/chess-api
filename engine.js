@@ -20,7 +20,7 @@ async function getResult(fen, mode = ENGINE_MODE.BEST_MOVE) {
   engine.send("ucinewgame");
   engine.send("position fen " + fen);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const onDone = (result) => {
       resolve(result);
     };

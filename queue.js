@@ -16,7 +16,7 @@ const getProgressReport = async () => {
   });
 }
 
-const getVoteResult = async (matchId) => {
+const getVoteResult = async () => {
   return redisClient.mget("yes", "no").then((result) => {
     return {
       yes: parseInt(result[0]),

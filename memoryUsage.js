@@ -1,4 +1,3 @@
-const os = require('os');
 const process = require('process');
 
 // Function to convert bytes to human-readable format
